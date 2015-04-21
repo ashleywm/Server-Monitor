@@ -9,6 +9,25 @@ import org.hyperic.sigar.Sigar;
 import org.hyperic.sigar.SigarException;
 
 public class SystemInfo {
+	
+	private static final String OS_LINUX = "Linux";
+	private static final String OS_WINOWS = "Windows";
+	
+	public boolean isLinux(){
+		if(System.getProperty("os.name").equals(OS_LINUX)){
+			return true;
+		}else{
+			return false;
+		}
+	}
+	
+	public boolean isWindows(){
+		if(System.getProperty("os.name").equals(OS_WINOWS)){
+			return true;
+		}else{
+			return false;
+		}
+	}
 
 	public static void getSysInfo() throws SigarException{
 		Sigar sigar = new Sigar();

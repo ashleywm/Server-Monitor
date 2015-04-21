@@ -6,8 +6,6 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Properties;
 
-import sun.misc.IOUtils;
-
 
 public class ConfigReader {
 

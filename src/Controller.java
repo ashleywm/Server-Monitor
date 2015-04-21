@@ -8,7 +8,6 @@ import org.hyperic.sigar.SigarException;
 
 public class Controller{
 
-	 static ConfigReader properties = new ConfigReader();
 	 private static String sysName;
 	 private static FileSystemController fsc;
 	
@@ -60,25 +59,7 @@ public class Controller{
 	}
 	
 	public static void main(String args[]){
-		
-		String loc = System.getenv("SystemDrive") + "\\config.properties";
-		
-		try {
-			fsc = new FileSystemController(new ConfigWriter(loc), new ConfigReader(loc));
-			fsc.getWriter().
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		
-		if(properties.isConfigure()){ //if configure is true then configuration is required
-			System.out.println("The system needs to be configured to start monitoring");
-			enterContinue();
-			nameSystem();
-			
-			//ConfigWriter cw = new ConfigWriter();
-			//cw.write(sysName, properties.getLocation());
-			
-		}
+		task();
 	}
 
 	
