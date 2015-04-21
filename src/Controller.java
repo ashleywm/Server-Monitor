@@ -11,8 +11,8 @@ public class Controller{
 	 private static String sysName;
 	 private static FileSystemController fsc;
 	
-	public static void Repeater(){ //neds constructor 
-		int initialDelay = 10000; // start after 30 seconds
+	public static void repeater(){ 
+		int initialDelay = 0; // start after 30 seconds
 		int period = 5000;        // repeat every 5 seconds
 		Timer timer = new Timer();
 		
@@ -59,7 +59,7 @@ public class Controller{
 	}
 	
 	public static void main(String args[]){
-		task();
+		repeater();
 	}
 
 	
