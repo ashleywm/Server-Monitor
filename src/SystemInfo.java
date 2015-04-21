@@ -11,9 +11,9 @@ import org.hyperic.sigar.SigarException;
 public class SystemInfo {
 	
 	private static final String OS_LINUX = "Linux";
-	private static final String OS_WINOWS = "Windows";
+	private static final String OS_WINDOWS = "Windows";
 	
-	public boolean isLinux(){
+	public static boolean isLinux(){
 		if(System.getProperty("os.name").equals(OS_LINUX)){
 			return true;
 		}else{
@@ -21,13 +21,42 @@ public class SystemInfo {
 		}
 	}
 	
-	public boolean isWindows(){
-		if(System.getProperty("os.name").equals(OS_WINOWS)){
+	public static boolean isWindows(){
+		if(System.getProperty("os.name").equals(OS_WINDOWS)){
 			return true;
 		}else{
 			return false;
 		}
 	}
+	
+	public static void windowsDiskInfo(Sigar sigar){
+		//Windows Directory Stats
+		try {
+			System.out.println(sigar.getDirStat("C:/").toMap());
+		} catch (SigarException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		//Windows Disk Size
+		long diskSize = new File("C:/").getTotalSpace()/1024/1024/1024; //bit
+		System.out.println(diskSize);
+	}
+	
+	public static void linuxDiskInfo(Sigar sigar){
+		//Linux Directory Stats
+		try {
+			System.out.println(sigar.getDirStat("/").toMap());
+		} catch (SigarException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		//Linux Disk Size
+		long diskSize = new File("/").getTotalSpace() / 1024 / 1024 / 1024;
+		System.out.println(diskSize);
+	}
+	
 
 	public static void getSysInfo() throws SigarException{
 		Sigar sigar = new Sigar();
@@ -49,7 +78,8 @@ public class SystemInfo {
 		System.out.println(sigar.getMem().getTotal()/1024/1024);
 
 		System.out.println(sigar.getMem().getUsedPercent());
-		System.out.println(sigar.getDirStat("C:/").toMap());
+		
+		
 
 
 		try {
@@ -59,8 +89,15 @@ public class SystemInfo {
 			e.printStackTrace();
 		}
 
-		long diskSize = new File("C:/").getTotalSpace()/1024/1024/1024; //bit
-		System.out.println(diskSize);
+
+		if(isWindows()){
+			windowsDiskInfo(sigar);
+		}else if(isLinux()){
+			linuxDiskInfo(sigar);
+		}else{
+			//why are you using bsd...
+		}
+
 
 		File[] paths;
 		FileSystemView fsv = FileSystemView.getFileSystemView();
