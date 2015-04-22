@@ -15,6 +15,7 @@ public class SystemInfo {
 	
 	private static final String OS_LINUX = "Linux";
 	private static final String OS_WINDOWS = "Windows";
+	//TODO: BSD, Solaris etc.
 	
 	public static boolean isLinux(){
 		if(System.getProperty("os.name").equals(OS_LINUX)){
