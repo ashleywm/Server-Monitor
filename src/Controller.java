@@ -9,7 +9,8 @@ public class Controller {
 	// static ConfigReader properties = new ConfigReader();
 	private static String sysName;
 	private static FileSystemController fsc;
-	private static String DEFAULT_LOCATION = System.getenv("SystemDrive") + "\\Monitoring\\config.properties";
+	private static String DEFAULT_LOCATION = System.getenv("SystemDrive") + "\\Monitoring\\";
+	private static String DEFAULT_FILE = "config.properties";
 	
 	public static void repeater() {
 		int initialDelay = 10000; // start after 30 seconds
@@ -75,10 +76,14 @@ public class Controller {
 			
 		}
 	}*/
+		
+		
 		FileSystemController fsc = new FileSystemController();
 		
-		if(!(fsc.checkDir(DEFAULT_LOCATION))){
-			fsc.makeFile(DEFAULT_LOCATION);
+		if(fsc.checkDir(DEFAULT_LOCATION)){
+			fsc.makeDir(DEFAULT_LOCATION);
+			fsc.makeFile(DEFAULT_LOCATION, DEFAULT_FILE);
+			System.out.println("Made");
 		}else{
 		System.out.println("outtttt");	
 		}

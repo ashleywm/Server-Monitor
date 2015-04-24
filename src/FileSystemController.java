@@ -10,26 +10,43 @@ public class FileSystemController {
 
 	public boolean checkDir(String defaultLocation ){
 		File theDir = new File(defaultLocation);
-		if (theDir.exists()){
+		if (!(theDir.exists())){
 			return true;
 		}else{
 			return false;
-
 		}
 	}
 
-	public void makeFile(String defaultLocation){
-		Writer writer = null;
+	public void makeDir(String defaultLocation){
+		try{
+
+			boolean success = (new File(defaultLocation)).mkdir();
+			if (success) {
+				System.out.println("Directory: " 
+						+ defaultLocation + " created");
+			}else{
+				System.out.println("Directory could not be created in it's default set location");
+			}
+		}catch (Exception e){//Catch exception if any
+			System.err.println("Error: " + e.getMessage());
+		}
+	}
+
+	public void makeFile(String defaultLocation, String filename) {
 
 		try {
-			writer = new BufferedWriter(new OutputStreamWriter(
-					new FileOutputStream(defaultLocation), "utf-8"));
-			writer.write("Something");
-		} catch (IOException ex) {
-		} finally {
-			try {writer.close();} catch (Exception ex) {//ignore}
-			}
+		      File file = new File(defaultLocation + filename );
+	 
+		      if (file.createNewFile()){
+		        System.out.println("File is created!");
+		      }else{
+		        System.out.println("File already exists.");
+		      }
+	 
+	    	} catch (IOException e) {
+		      e.printStackTrace();
 		}
+		
 	}
 
 }
