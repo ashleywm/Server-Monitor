@@ -1,5 +1,3 @@
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.Scanner;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -11,7 +9,8 @@ public class Controller {
 	// static ConfigReader properties = new ConfigReader();
 	private static String sysName;
 	private static FileSystemController fsc;
-
+	private static String DEFAULT_LOCATION = System.getenv("SystemDrive") + "\\Monitoring\\config.properties";
+	
 	public static void repeater() {
 		int initialDelay = 10000; // start after 30 seconds
 		int period = 5000; // repeat every 5 seconds
@@ -76,6 +75,14 @@ public class Controller {
 			
 		}
 	}*/
+		FileSystemController fsc = new FileSystemController();
+		
+		if(!(fsc.checkDir(DEFAULT_LOCATION))){
+			fsc.makeFile(DEFAULT_LOCATION);
+		}else{
+		System.out.println("outtttt");	
+		}
+		
 		repeater();
 	}
 

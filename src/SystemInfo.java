@@ -1,15 +1,9 @@
 import java.io.File;
-import java.net.NetworkInterface;
-import java.net.SocketException;
-
-import javax.swing.filechooser.FileSystemView;
-
 import org.hyperic.sigar.CpuInfo;
 import org.hyperic.sigar.Sigar;
 import org.hyperic.sigar.SigarException;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.json.JSONTokener;
 
 public class SystemInfo {
 	
