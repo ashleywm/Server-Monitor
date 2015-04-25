@@ -1,10 +1,5 @@
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
-
 
 public class FileSystemController {
 
@@ -17,14 +12,19 @@ public class FileSystemController {
 		}
 	}
 
+	public boolean checkFile(String defaultLocation, String filename){
+		File theDir = new File(defaultLocation+filename);
+		if (!(theDir.exists())){
+			return true;
+		}else{
+			return false;
+		}
+	}
+	
 	public void makeDir(String defaultLocation){
 		try{
-
 			boolean success = (new File(defaultLocation)).mkdir();
-			if (success) {
-				System.out.println("Directory: " 
-						+ defaultLocation + " created");
-			}else{
+			if (!(success)) {
 				System.out.println("Directory could not be created in it's default set location");
 			}
 		}catch (Exception e){//Catch exception if any
@@ -35,20 +35,19 @@ public class FileSystemController {
 	public void makeFile(String defaultLocation, String filename) {
 
 		try {
-		      File file = new File(defaultLocation + filename );
-	 
-		      if (file.createNewFile()){
-		        System.out.println("File is created!");
-		      }else{
-		        System.out.println("File already exists.");
-		      }
-	 
-	    	} catch (IOException e) {
-		      e.printStackTrace();
-		}
-		
-	}
+			File file = new File(defaultLocation + filename );
 
+			if (!(file.createNewFile())){
+				System.out.println("File already exists.");
+			}
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+	}
 }
+
+
 
 

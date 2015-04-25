@@ -10,12 +10,7 @@ import java.util.Properties;
 public class ConfigReader {
 
 	private String name, loc;
-	private boolean configure; 
-
-	public ConfigReader(String loc){
-		this.loc = loc;
-	}
-
+	
 	public  void getSavedConfig() throws IOException {
 
 
@@ -32,7 +27,6 @@ public class ConfigReader {
 			throw new FileNotFoundException("property file '" + propFileName + "' not found in the classpath");
 		}
 
-		configure = Boolean.parseBoolean(prop.getProperty("configure"));
 		name = prop.getProperty("name");
 		
 		inputStream.close();
@@ -43,9 +37,4 @@ public class ConfigReader {
 	public String getName() {
 		return name;
 	}
-
-	public boolean isConfigure() {
-		return configure;
-	}
-
 }

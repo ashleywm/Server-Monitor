@@ -7,7 +7,7 @@ import org.hyperic.sigar.SigarException;
 public class Controller {
 
 	// static ConfigReader properties = new ConfigReader();
-	private static String sysName;
+	private static String sysName = "";
 	private static FileSystemController fsc;
 	private static String DEFAULT_LOCATION = System.getenv("SystemDrive") + "\\Monitoring\\";
 	private static String DEFAULT_FILE = "config.properties";
@@ -40,52 +40,49 @@ public class Controller {
 		System.out.println("Press enter to continue...");
 		Scanner keyIn = new Scanner(System.in);
 		keyIn.nextLine();
-		keyIn.close();
+	
 	}
 
 	public static void nameSystem() {
-		Scanner keyIn = new Scanner(System.in);
+		Scanner nameIn = new Scanner(System.in);
 
 		System.out.println("Please enter a friendly system name ");
-		sysName = keyIn.nextLine();
+		sysName = nameIn.nextLine();
 		while (sysName.equalsIgnoreCase("")) {
 			System.out.println("Please enter a friendly system name ");
-			sysName = keyIn.nextLine();
+			sysName = nameIn.nextLine();
 		}
 		System.out.println(sysName);
-		keyIn.close();
+
 	}
 
-	public static void main(String args[]) {
-		/*String loc = System.getenv("SystemDrive") + "\\config.properties";
+	public static void main(String args[]) throws SigarException {
 		
-		try {
-			fsc = new FileSystemController(new ConfigWriter(loc), new ConfigReader(loc));
-			fsc.getWriter().
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		FileSystemController fsc = new FileSystemController();
+		ConfigWriter cw = new ConfigWriter();
 		
-		if(properties.isConfigure()){ //if configure is true then configuration is required
+		if(fsc.checkDir(DEFAULT_LOCATION) && fsc.checkFile(DEFAULT_LOCATION, DEFAULT_FILE)){ //if the folder or file doesn't exist 
+					
 			System.out.println("The system needs to be configured to start monitoring");
 			enterContinue();
 			nameSystem();
 			
-			//ConfigWriter cw = new ConfigWriter();
-			//cw.write(sysName, properties.getLocation());
-			
-		}
-	}*/
-		
-		
-		FileSystemController fsc = new FileSystemController();
-		
-		if(fsc.checkDir(DEFAULT_LOCATION)){
 			fsc.makeDir(DEFAULT_LOCATION);
-			fsc.makeFile(DEFAULT_LOCATION, DEFAULT_FILE);
-			System.out.println("Made");
+			cw.writeInitial(sysName, DEFAULT_LOCATION+DEFAULT_FILE);
+			
+			System.out.println("Configuration has been Made in " +DEFAULT_LOCATION+DEFAULT_FILE);
+		}else if(!(fsc.checkDir(DEFAULT_LOCATION)) && fsc.checkFile(DEFAULT_LOCATION, DEFAULT_FILE)){  //if the folder exists but the file does not 
+			
+			System.out.println("The system needs to be configured to start monitoring");
+			enterContinue();
+			nameSystem();
+			
+			cw.writeInitial(sysName, DEFAULT_LOCATION+DEFAULT_FILE);
+			
+			System.out.println("Configuration has been Made in " +DEFAULT_LOCATION+DEFAULT_FILE);
+		
 		}else{
-		System.out.println("outtttt");	
+			System.out.println("Config exists");
 		}
 		
 		repeater();
