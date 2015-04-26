@@ -12,8 +12,9 @@ import org.hyperic.sigar.SigarException;
 public class Controller {
 
 	// static ConfigReader properties = new ConfigReader();
-	private static String sysName = "";
-	private static FileSystemController fsc;
+	private static String sysName = "", token;
+	private static PropertiesHandler propH = new PropertiesHandler();
+	private static ApiHandler apiH = new ApiHandler();
 	private static String DEFAULT_LOCATION = System.getenv("SystemDrive") + "\\Monitoring\\";
 	private static String DEFAULT_FILE = "config.properties";
 
@@ -61,6 +62,21 @@ public class Controller {
 
 	}
 
+	public static void userkey() {
+		Scanner keyIn = new Scanner(System.in);
+
+		String key;
+		
+		System.out.println("Please enter the system key ");
+		key = keyIn.next();
+		while (key.equalsIgnoreCase("")) {
+			System.out.println("Please enter the system key ");
+			key = keyIn.next();
+		}
+		token = apiH.getToken(key);
+
+	}
+	
 	public static void updateConfig(){
 
 		Scanner input = new Scanner(System.in);
@@ -83,49 +99,51 @@ public class Controller {
 
 	public static void main(String args[]) throws SigarException, IOException {
 
-		FileSystemController fsc = new FileSystemController();
-		ConfigWriter cw = new ConfigWriter();
-		ConfigReader cr = new ConfigReader();
-
-
-		if(fsc.checkDir(DEFAULT_LOCATION) && fsc.checkFile(DEFAULT_LOCATION, DEFAULT_FILE)){ //if the folder or file doesn't exist 
+		
+		if(propH.checkDir(DEFAULT_LOCATION) && propH.checkFile(DEFAULT_LOCATION, DEFAULT_FILE)){ //if the folder or file doesn't exist 
 
 			System.out.println("The system needs to be configured to start monitoring");
 			enterContinue();
 			nameSystem();
+			userkey();
 
-			fsc.makeDir(DEFAULT_LOCATION);
-			cw.writeInitial(sysName, DEFAULT_LOCATION+DEFAULT_FILE);
+			propH.makeDir(DEFAULT_LOCATION);
+			propH.writeInitial(sysName, token, DEFAULT_LOCATION+DEFAULT_FILE);
 
 			System.out.println("Configuration has been Made in " +DEFAULT_LOCATION+DEFAULT_FILE);
-		}else if(!(fsc.checkDir(DEFAULT_LOCATION)) && fsc.checkFile(DEFAULT_LOCATION, DEFAULT_FILE)){  //if the folder exists but the file does not 
+		}else if(!(propH.checkDir(DEFAULT_LOCATION)) && propH.checkFile(DEFAULT_LOCATION, DEFAULT_FILE)){  //if the folder exists but the file does not 
 
 			System.out.println("The system needs to be configured to start monitoring");
 			enterContinue();
 			nameSystem();
-
-			cw.writeInitial(sysName, DEFAULT_LOCATION+DEFAULT_FILE);
+			userkey();
+			
+			propH.writeInitial(sysName, token, DEFAULT_LOCATION+DEFAULT_FILE);
 
 			System.out.println("Configuration has been Made in " +DEFAULT_LOCATION+DEFAULT_FILE);
 
-		}else if(!(fsc.checkDir(DEFAULT_LOCATION) && fsc.checkFile(DEFAULT_LOCATION, DEFAULT_FILE))){ //if both exist 
-			if(!(cr.checkConfig(DEFAULT_LOCATION, DEFAULT_FILE))){
+		}else if(!(propH.checkDir(DEFAULT_LOCATION) && propH.checkFile(DEFAULT_LOCATION, DEFAULT_FILE))){ //if both exist 
+			if(!(propH.checkConfig(DEFAULT_LOCATION, DEFAULT_FILE))){
 				System.out.println("The system needs to be configured to start monitoring");
 				enterContinue();
 				nameSystem();
+				userkey();
 
-				cw.writeInitial(sysName, DEFAULT_LOCATION+DEFAULT_FILE);
+				propH.writeInitial(sysName, token, DEFAULT_LOCATION+DEFAULT_FILE);
 
 				System.out.println("Configuration has been Made in " +DEFAULT_LOCATION+DEFAULT_FILE);
-			}else{
+			}else if(propH.checkConfig(DEFAULT_LOCATION, DEFAULT_FILE)){
 				System.out.println("Configuration is valid, do you want to force a system check? Y/N \n(Recommended if you have changed system hardware)");
 				updateConfig();
 			}
 
 		}
 
-		repeater();
+		//repeater();
+		//ApiCall ac = new ApiCall();
+		//ApiCall.call();
 
+		System.out.println("Done");
 	}
 
 }
