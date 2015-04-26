@@ -42,7 +42,10 @@ public class ConfigWriter {
             if (drives != null && drives.length > 0) {
                 for (File aDrive : drives) {
                 	if(aDrive.getTotalSpace() > 0){ //if space is 0 then assume CD/DVD
-                		String disk = "Disk_"+aDrive;
+                		
+                		String driveIn = aDrive.toString();
+                		String drive = driveIn.replaceAll("[^a-zA-Z]", "");
+                		String disk = "Disk_"+drive;
                 		String size =  Long.toString(aDrive.getTotalSpace());
                 		prop.setProperty(disk, size);
                 	}

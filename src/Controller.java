@@ -75,18 +75,13 @@ public class Controller {
 				System.out.println("Configuration is valid, do you want to force a system check? Y/N");
 				in = input.next();
 			}
-			
+
 		}
 		input.close();
 	}
 
 
-
 	public static void main(String args[]) throws SigarException, IOException {
-
-
-
-
 
 		FileSystemController fsc = new FileSystemController();
 		ConfigWriter cw = new ConfigWriter();
@@ -128,9 +123,9 @@ public class Controller {
 			}
 
 		}
-		
+
 		repeater();
-		
+
 	}
 
 }
