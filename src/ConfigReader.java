@@ -1,3 +1,4 @@
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -31,6 +32,20 @@ public class ConfigReader {
 		
 		inputStream.close();
 
+	}
+
+	
+	public boolean checkConfig(String location, String file) throws IOException {
+
+		Properties prop = new Properties();
+
+		prop.load(new FileInputStream(location+file));
+
+		if(prop.getProperty("System_Name") != null){
+			return true; //name is configured 
+		}else{
+			return false;
+		}
 	}
 
 
