@@ -65,13 +65,8 @@ public class ApiHandler {
 		
 		PropertiesHandler proph = new PropertiesHandler();
 		
-		
-		System.out.println(" here" + proph.getToken());
-		
 		input.put("token", proph.getToken());
 		
-		System.out.println(input);
-
 		try {
 
 			URL url = new URL("http://student20265.201415.uk/pmt/api/update/"+apiUrl);

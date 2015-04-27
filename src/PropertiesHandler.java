@@ -98,13 +98,14 @@ public class PropertiesHandler {
 
 		prop.load(new FileInputStream(location+file));
 
-		//if(prop.getProperty("Token") == null){
-			//throw new RuntimeException("ERROR: Token not found");
-		//}else{
+		if(prop.getProperty("Token") == null){
+			throw new RuntimeException("ERROR: Token not found");
+		}else{
 			token = prop.getProperty("Token");
 			System.out.println("this " + token);
-		//}
+		}
 	}
+
 
 	public String getToken() {
 		return token;

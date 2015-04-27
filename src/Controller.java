@@ -13,8 +13,17 @@ public class Controller {
 	private static String sysName = "", token;
 	private static PropertiesHandler propH = new PropertiesHandler();
 	private static ApiHandler apiH = new ApiHandler();
-	private static String DEFAULT_LOCATION = System.getenv("SystemDrive") + "\\Monitoring\\";
-	private static String DEFAULT_FILE = "config.properties";
+	private static final String DEFAULT_LOCATION = System.getProperty("user.home") + "/Monitoring/";
+	private static final String DEFAULT_FILE = "config.properties";
+	
+	public static void  locationSetter(){
+		
+		//if(System.getenv("SystemDrive") == null){
+		//	DEFAULT_LOCATION = "\\\\Monitoring\\";
+		//}else{
+		
+		//}
+	}
 
 	public static void repeater() {
 		int initialDelay = 10000; // start after 30 seconds
@@ -97,6 +106,7 @@ public class Controller {
 
 	public static void main(String args[]) throws SigarException, IOException {
 
+		locationSetter();
 		
 		if(propH.checkDir(DEFAULT_LOCATION) && propH.checkFile(DEFAULT_LOCATION, DEFAULT_FILE)){ //if the folder or file doesn't exist 
 
@@ -133,6 +143,8 @@ public class Controller {
 			}else if(propH.checkConfig(DEFAULT_LOCATION, DEFAULT_FILE)){
 				System.out.println("Configuration is valid, do you want to force a system check? Y/N \n(Recommended if you have changed system hardware)");
 				updateConfig();
+				
+				
 			}
 
 		}
@@ -143,13 +155,18 @@ public class Controller {
 		
 		propH.storeToken(DEFAULT_LOCATION, DEFAULT_FILE);
 		
-		JSONObject input = new JSONObject();
 		
-		input.put("operating_system", System.getProperty("os.name"));
-		input.put("name", sysName);
+		//repeater();
+
+		InitialSysInfo isi = new InitialSysInfo();
+		isi.sendInfo();
 		
-		apiH.apiCall("", input);
 		System.out.println("Done");
+		
+	}
+
+	public String getSysName() {
+		return sysName;
 	}
 
 }

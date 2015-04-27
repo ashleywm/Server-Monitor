@@ -1,5 +1,7 @@
 import java.io.File;
+
 import org.hyperic.sigar.CpuInfo;
+import org.hyperic.sigar.ProcCpu;
 import org.hyperic.sigar.Sigar;
 import org.hyperic.sigar.SigarException;
 import org.json.JSONException;
@@ -94,6 +96,16 @@ public class SystemInfo {
 		return cpu;
 	}
 	
+	
+	public static void updateJson() throws SigarException{
+		Sigar sigar = new Sigar();
+		JSONObject sys = new JSONObject();
+		String uptime = Double.toString(sigar.getUptime().getUptime());
+		sys.put("uptime", uptime);
+		ApiHandler apih = new ApiHandler();
+		apih.apiCall("", sys);
+	}
+	
 	public static JSONObject memJson() throws SigarException{
 		Sigar sigar = new Sigar();
 		JSONObject mem = new JSONObject();
@@ -104,65 +116,12 @@ public class SystemInfo {
 	
 
 	public static void getSysInfo() throws SigarException{
-		jsonizer();
-		/*
-		Sigar sigar = new Sigar();
-		org.hyperic.sigar.CpuInfo[] infos = sigar.getCpuInfoList();
-		System.out.println("Client:" + sigar.getFQDN());
-		System.out.println("Hostname:" + sigar.getNetInfo().getHostName());
-		System.out.println(System.getProperty("os.name"));
-
-		org.hyperic.sigar.CpuInfo info = infos[0];
-		System.out.println("Vendor........." + info.getVendor());
-		System.out.println("Model.........." + info.getModel());
-		System.out.println("Mhz............" + info.getMhz());
-		System.out.println("Total Cores...." + info.getTotalCores());
-		System.out.println("Cache Size....." + info.getCacheSize());
-		if ((info.getTotalCores() != info.getTotalSockets()) ||
-				(info.getCoresPerSocket() < info.getTotalCores()))
-		{
-			System.out.println("Number of sockets.." + info.getTotalSockets());
-			System.out.println("Cores per CPU.." + info.getCoresPerSocket());
-		}
-		System.out.println(sigar.getMem().getTotal()/1024/1024);
-
-		System.out.println(sigar.getMem().getUsedPercent());
 		
+		updateJson();
+
+		//jsonizer();
+
 		
-
-
-		try {
-			System.out.println(NetworkInterface.getNetworkInterfaces());
-		} catch (SocketException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-
-		if(isWindows()){
-			windowsDiskInfo(sigar);
-		}else if(isLinux()){
-			linuxDiskInfo(sigar);
-		}else{
-			//why are you using bsd...
-		}
-
-
-		File[] paths;
-		FileSystemView fsv = FileSystemView.getFileSystemView();
-
-		// returns pathnames for files and directory
-		paths = File.listRoots();
-
-		// for each pathname in pathname array
-		for(File path:paths)
-		{
-			// prints file and directory paths
-			if(!("CD Drive".equalsIgnoreCase(fsv.getSystemTypeDescription(path)))){
-				System.out.println("Drive Name: "+path);
-				System.out.println("Description: "+fsv.getSystemTypeDescription(path));
-			}
-		}*/
 
 	}
 }
