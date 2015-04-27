@@ -1,13 +1,11 @@
-import java.io.File;
+
 import java.io.IOException;
 import java.util.Scanner;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import javax.swing.filechooser.FileSystemView;
-
-import org.hyperic.sigar.Sigar;
 import org.hyperic.sigar.SigarException;
+import org.json.JSONObject;
 
 public class Controller {
 
@@ -142,7 +140,15 @@ public class Controller {
 		//repeater();
 		//ApiCall ac = new ApiCall();
 		//ApiCall.call();
-
+		
+		propH.storeToken(DEFAULT_LOCATION, DEFAULT_FILE);
+		
+		JSONObject input = new JSONObject();
+		
+		input.put("operating_system", System.getProperty("os.name"));
+		input.put("name", sysName);
+		
+		apiH.apiCall("", input);
 		System.out.println("Done");
 	}
 

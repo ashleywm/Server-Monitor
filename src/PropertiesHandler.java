@@ -1,20 +1,16 @@
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Properties;
 
-import jdk.nashorn.internal.parser.JSONParser;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 public class PropertiesHandler {
 
-	private String name, loc;
+	private String loc; 
+	private static String token = "";
+	
+	
 	
 	public boolean checkDir(String defaultLocation ){
 		File theDir = new File(defaultLocation);
@@ -79,28 +75,6 @@ public class PropertiesHandler {
 
 	}
 	
-	public  void getSavedConfig() throws IOException {
-
-
-		Properties prop = new Properties();
-		String propFileName = loc+"config.properties";
-
-		InputStream inputStream = getClass().getClassLoader().getResourceAsStream(propFileName);
-
-		if (inputStream != null) {
-			prop.load(inputStream);
-				
-
-		} else {
-			throw new FileNotFoundException("property file '" + propFileName + "' not found in the classpath");
-		}
-
-		name = prop.getProperty("System_Name");
-		
-		inputStream.close();
-
-	}
-
 	
 	public boolean checkConfig(String location, String file) throws IOException {
 
@@ -116,6 +90,24 @@ public class PropertiesHandler {
 		}else{
 			return false;
 		}
+	}
+	
+	public void storeToken(String location, String file) throws IOException {
+
+		Properties prop = new Properties();
+
+		prop.load(new FileInputStream(location+file));
+
+		//if(prop.getProperty("Token") == null){
+			//throw new RuntimeException("ERROR: Token not found");
+		//}else{
+			token = prop.getProperty("Token");
+			System.out.println("this " + token);
+		//}
+	}
+
+	public String getToken() {
+		return token;
 	}
 
 }
