@@ -15,15 +15,7 @@ public class Controller {
 	private static ApiHandler apiH = new ApiHandler();
 	private static final String DEFAULT_LOCATION = System.getProperty("user.home") + "/Monitoring/";
 	private static final String DEFAULT_FILE = "config.properties";
-	
-	public static void  locationSetter(){
-		
-		//if(System.getenv("SystemDrive") == null){
-		//	DEFAULT_LOCATION = "\\\\Monitoring\\";
-		//}else{
-		
-		//}
-	}
+
 
 	public static void repeater() {
 		int initialDelay = 10000; // start after 30 seconds
@@ -105,8 +97,6 @@ public class Controller {
 
 
 	public static void main(String args[]) throws SigarException, IOException {
-
-		locationSetter();
 		
 		if(propH.checkDir(DEFAULT_LOCATION) && propH.checkFile(DEFAULT_LOCATION, DEFAULT_FILE)){ //if the folder or file doesn't exist 
 
@@ -158,7 +148,7 @@ public class Controller {
 		
 		//repeater();
 
-		InitialSysInfo isi = new InitialSysInfo();
+		StaticSysInfo isi = new StaticSysInfo();
 		isi.sendInfo();
 		
 		System.out.println("Done");

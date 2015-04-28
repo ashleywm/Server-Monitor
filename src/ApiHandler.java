@@ -6,12 +6,13 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import org.hyperic.sigar.Sigar;
+import org.hyperic.sigar.SigarException;
 import org.json.JSONObject;
 
 
 public class ApiHandler {
 
-	private PropertiesHandler proph;
 	String token;
 
 	public String getToken(String key) {
@@ -67,6 +68,8 @@ public class ApiHandler {
 		
 		input.put("token", proph.getToken());
 		
+		System.out.println(input);
+		
 		try {
 
 			URL url = new URL("http://student20265.201415.uk/pmt/api/update/"+apiUrl);
@@ -94,11 +97,6 @@ public class ApiHandler {
 		} catch (IOException e) {
 
 			e.printStackTrace();
-
 		}
-
 	}
-
-
-
 }
