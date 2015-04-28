@@ -98,18 +98,18 @@ public class Controller {
 
 	public static void main(String args[]) throws SigarException, IOException {
 		
-		if(propH.checkDir(DEFAULT_LOCATION) && propH.checkFile(DEFAULT_LOCATION, DEFAULT_FILE)){ //if the folder or file doesn't exist 
+		if(propH.checkDir() && propH.checkFile()){ //if the folder or file doesn't exist 
 
 			System.out.println("The system needs to be configured to start monitoring");
 			enterContinue();
 			nameSystem();
 			userkey();
 
-			propH.makeDir(DEFAULT_LOCATION);
+			propH.makeDir();
 			propH.writeInitial(sysName, token, DEFAULT_LOCATION+DEFAULT_FILE);
 
 			System.out.println("Configuration has been Made in " +DEFAULT_LOCATION+DEFAULT_FILE);
-		}else if(!(propH.checkDir(DEFAULT_LOCATION)) && propH.checkFile(DEFAULT_LOCATION, DEFAULT_FILE)){  //if the folder exists but the file does not 
+		}else if(!(propH.checkDir()) && propH.checkFile()){  //if the folder exists but the file does not 
 
 			System.out.println("The system needs to be configured to start monitoring");
 			enterContinue();
@@ -120,8 +120,8 @@ public class Controller {
 
 			System.out.println("Configuration has been Made in " +DEFAULT_LOCATION+DEFAULT_FILE);
 
-		}else if(!(propH.checkDir(DEFAULT_LOCATION) && propH.checkFile(DEFAULT_LOCATION, DEFAULT_FILE))){ //if both exist 
-			if(!(propH.checkConfig(DEFAULT_LOCATION, DEFAULT_FILE))){
+		}else if(!(propH.checkDir() && propH.checkFile())){ //if both exist 
+			if(!(propH.checkConfig())){
 				System.out.println("The system needs to be configured to start monitoring");
 				enterContinue();
 				nameSystem();
@@ -130,7 +130,7 @@ public class Controller {
 				propH.writeInitial(sysName, token, DEFAULT_LOCATION+DEFAULT_FILE);
 
 				System.out.println("Configuration has been Made in " +DEFAULT_LOCATION+DEFAULT_FILE);
-			}else if(propH.checkConfig(DEFAULT_LOCATION, DEFAULT_FILE)){
+			}else if(propH.checkConfig()){
 				System.out.println("Configuration is valid, do you want to force a system check? Y/N \n(Recommended if you have changed system hardware)");
 				updateConfig();
 				
@@ -143,7 +143,7 @@ public class Controller {
 		//ApiCall ac = new ApiCall();
 		//ApiCall.call();
 		
-		propH.storeToken(DEFAULT_LOCATION, DEFAULT_FILE);
+		propH.storeToken();
 		
 		
 		//repeater();

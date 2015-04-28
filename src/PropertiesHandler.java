@@ -4,16 +4,19 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Properties;
 
+import org.json.JSONObject;
+
 
 public class PropertiesHandler {
 
 	private String loc; 
 	private static String token = "";
-	
-	
-	
-	public boolean checkDir(String defaultLocation ){
-		File theDir = new File(defaultLocation);
+	private static String DEFAULT_LOCATION = System.getProperty("user.home") + "/Monitoring/";
+	private static String DEFAULT_FILE = "config.properties";
+
+
+	public boolean checkDir(){
+		File theDir = new File(DEFAULT_LOCATION);
 		if (!(theDir.exists())){
 			return true;
 		}else{
@@ -21,18 +24,18 @@ public class PropertiesHandler {
 		}
 	}
 
-	public boolean checkFile(String defaultLocation, String filename){
-		File theDir = new File(defaultLocation+filename);
+	public boolean checkFile(){
+		File theDir = new File(DEFAULT_LOCATION+DEFAULT_FILE);
 		if (!(theDir.exists())){
 			return true;
 		}else{
 			return false;
 		}
 	}
-	
-	public void makeDir(String defaultLocation){
+
+	public void makeDir(){
 		try{
-			boolean success = (new File(defaultLocation)).mkdir();
+			boolean success = (new File(DEFAULT_LOCATION)).mkdir();
 			if (!(success)) {
 				System.out.println("Directory could not be created in it's default set location");
 			}
@@ -41,10 +44,10 @@ public class PropertiesHandler {
 		}
 	}
 
-	public void makeFile(String defaultLocation, String filename) {
+	public void makeFile() {
 
 		try {
-			File file = new File(defaultLocation + filename );
+			File file = new File(DEFAULT_LOCATION + DEFAULT_FILE );
 
 			if (!(file.createNewFile())){
 				System.out.println("File already exists.");
@@ -55,48 +58,48 @@ public class PropertiesHandler {
 		}
 
 	}
-	
+
 	public void writeInitial(String name, String token, String loc){
 
 		Properties prop = new Properties();
 		System.out.println(token);
-				
-        try {
 
-            prop.setProperty("System_Name", name);
-            prop.setProperty("Token", token);
-        
-            FileOutputStream fo = new FileOutputStream(loc);
-            prop.store(fo, null);
- 
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
+		try {
+
+			prop.setProperty("System_Name", name);
+			prop.setProperty("Token", token);
+
+			FileOutputStream fo = new FileOutputStream(loc);
+			prop.store(fo, null);
+
+		} catch (IOException ex) {
+			ex.printStackTrace();
+		}
 
 	}
-	
-	
-	public boolean checkConfig(String location, String file) throws IOException {
+
+
+	public boolean checkConfig() throws IOException {
 
 		Properties prop = new Properties();
 
-		prop.load(new FileInputStream(location+file));
+		prop.load(new FileInputStream(DEFAULT_LOCATION+DEFAULT_FILE));
 
 		String name = prop.getProperty("System_Name");
 		name = name.replaceAll("[^a-zA-Z\\s]", ""); //buggy 
-		
+
 		if(prop.getProperty("System_Name") != null && name != null ){
 			return true; //name is configured 
 		}else{
 			return false;
 		}
 	}
-	
-	public void storeToken(String location, String file) throws IOException {
+
+	public void storeToken() throws IOException {
 
 		Properties prop = new Properties();
 
-		prop.load(new FileInputStream(location+file));
+		prop.load(new FileInputStream(DEFAULT_LOCATION+DEFAULT_FILE));
 
 		if(prop.getProperty("Token") == null){
 			throw new RuntimeException("ERROR: Token not found");
@@ -106,7 +109,22 @@ public class PropertiesHandler {
 		}
 	}
 
+	public void storeDisk(JSONObject disk ) throws IOException {
 
+		Properties prop = new Properties();
+		System.out.println(token);
+
+		try {
+			prop.setProperty("Disk", disk.toString());
+
+			FileOutputStream fo = new FileOutputStream(DEFAULT_LOCATION+DEFAULT_FILE, true);
+			prop.store(fo, null);
+
+		} catch (IOException ex) {
+			ex.printStackTrace();
+		}
+
+	}
 	public String getToken() {
 		return token;
 	}
