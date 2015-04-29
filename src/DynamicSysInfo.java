@@ -2,6 +2,9 @@ import java.io.IOException;
 
 import org.hyperic.sigar.Cpu;
 import org.hyperic.sigar.CpuPerc;
+import org.hyperic.sigar.NetFlags;
+import org.hyperic.sigar.NetInterfaceConfig;
+import org.hyperic.sigar.NetInterfaceStat;
 import org.hyperic.sigar.Sigar;
 import org.hyperic.sigar.SigarException;
 import org.json.JSONObject;
@@ -17,6 +20,7 @@ public class DynamicSysInfo {
 	public void sendInfo() throws SigarException{
 		apiH.apiCall("cpu/1/", cpuInfoD());
 		apiH.apiCall("ram/", ramInfoD());
+		apiH.apiCall("network/1/", networkInfoD());
 		apiH.apiCall("", sysInfoD());
 		/*try {
 			apiH.apiCall("network/1/", networkInfo());
@@ -25,6 +29,9 @@ public class DynamicSysInfo {
 			e1.printStackTrace();
 		}
 		diskInfo();*/
+
+
+
 	}
 
 	public static JSONObject sysInfoD() throws SigarException{
@@ -48,16 +55,35 @@ public class DynamicSysInfo {
 
 		return cpu;
 	}
-	
+
 
 	public static JSONObject ramInfoD() throws SigarException{
 		JSONObject mem = new JSONObject();
 
 		String ramUsed = Long.toString(sigar.getMem().getUsed()/1024/1024);
-		
+
 		mem.put("in_use", ramUsed);
 
 		return mem;
+	}
+
+	public static JSONObject networkInfoD() throws SigarException{
+		JSONObject net = new JSONObject();
+
+		String ramUsed = Long.toString(sigar.getMem().getUsed()/1024/1024);
+
+		NetInterfaceStat netStat = sigar.getNetInterfaceStat("eth1");
+		NetInterfaceConfig ifConfig = sigar.getNetInterfaceConfig("eth1");
+
+		String down = Long.toString(netStat.getRxBytes()/1024);
+
+		String up = Long.toString(netStat.getTxBytes()/1024);
+
+		
+		net.put("upload_total ", up);
+		net.put("download_total ", down);
+
+		return net;
 	}
 
 
