@@ -34,11 +34,13 @@ public class Controller {
 	}
 
 	public static void task() {
-		try {
-			SystemInfo.getSysInfo();
-		} catch (SigarException e) {
-			e.printStackTrace();
-		}
+			DynamicSysInfo dsi = new DynamicSysInfo();
+			try {
+				dsi.sendInfo();
+			} catch (SigarException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 	}
 
 	public static void enterContinue() {
@@ -151,8 +153,10 @@ public class Controller {
 		StaticSysInfo isi = new StaticSysInfo();
 		isi.sendInfo();
 		
-		System.out.println("Done");
+		System.out.println("Starting Repeating Tasks");
 		
+		repeater();
+
 	}
 
 	public String getSysName() {

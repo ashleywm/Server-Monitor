@@ -3,13 +3,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.InetAddress;
-import java.net.MalformedURLException;
-import java.net.NetworkInterface;
-import java.net.SocketException;
 import java.net.URL;
-import java.net.UnknownHostException;
-import java.util.Collections;
-import java.util.Enumeration;
 
 import javax.swing.filechooser.FileSystemView;
 
@@ -95,10 +89,10 @@ public class StaticSysInfo {
 		BufferedReader buffer = new BufferedReader(new InputStreamReader(getPublic.openStream()));
 		String publicIP = buffer.readLine(); //you get the IP as a String
 		
-		InetAddress localIP =InetAddress.getLocalHost();
+		InetAddress localIP = InetAddress.getLocalHost();
 		
-		net.put("ip_address",sigar.getNetInfo().getHostName());
-		net.put("hostname", localIP.getHostAddress());
+		net.put("ip_address", localIP.getHostAddress());
+		net.put("hostname", sigar.getNetInfo().getHostName());
 		net.put("gateway",sigar.getNetInfo().getDefaultGateway());
 		net.put("public_ip", publicIP);
 		
