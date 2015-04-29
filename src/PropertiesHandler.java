@@ -126,26 +126,13 @@ public class PropertiesHandler {
 
 	}
 	
-	public void getEth() throws IOException {
-
-		Properties prop = new Properties();
-
-		prop.load(new FileInputStream(DEFAULT_LOCATION+DEFAULT_FILE));
-
-		if(prop.getProperty("Network") == null){
-			throw new RuntimeException("ERROR: Network not found");
-		}else{
-			eth = prop.getProperty("Network");
-		}
-	}
-
-	public void storeEth(String eth ) throws IOException {
+	public void getDisks(JSONObject disk ) throws IOException {
 
 		Properties prop = new Properties();
 		System.out.println(token);
 
 		try {
-			prop.setProperty("Network", eth);
+			prop.setProperty("Disk", disk.toString());
 
 			FileOutputStream fo = new FileOutputStream(DEFAULT_LOCATION+DEFAULT_FILE, true);
 			prop.store(fo, null);
@@ -155,13 +142,14 @@ public class PropertiesHandler {
 		}
 
 	}
+	
+
+	
+
 	public String getToken() {
 		return token;
 	}
 
-	public String getNetName() {
-		return eth;
-	}
 }
 
 

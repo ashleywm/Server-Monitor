@@ -53,6 +53,8 @@ public class StaticSysInfo {
 
 	public static void diskInfo() throws SigarException{
 
+		JSONObject disks = new JSONObject();
+
 		File[] paths;
 
 		paths = File.listRoots();
@@ -92,24 +94,6 @@ public class StaticSysInfo {
 		String publicIP = buffer.readLine(); //you get the IP as a String
 
 		InetAddress localIP = InetAddress.getLocalHost();
-
-		Enumeration<NetworkInterface> nets = NetworkInterface.getNetworkInterfaces();
-		for (NetworkInterface netint : Collections.list(nets)){
-			Enumeration<InetAddress> inetAddresses = netint.getInetAddresses();
-			for (InetAddress inetAddress : Collections.list(inetAddresses)) {
-
-				String local = localIP.getHostAddress().toString();
-				String address = inetAddress.getHostAddress().toString();
-				
-				if(local.equalsIgnoreCase(address) ){
-									
-					String netName = netint.getName();
-					System.out.println("NETWORK ADAPATER NAME: "+netName );
-			
-					propH.storeEth(netName);
-				}
-			}
-		}
 
 		net.put("ip_address", localIP.getHostAddress());
 		net.put("hostname", sigar.getNetInfo().getHostName());

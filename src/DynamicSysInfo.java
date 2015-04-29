@@ -1,4 +1,9 @@
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.hyperic.sigar.Cpu;
 import org.hyperic.sigar.CpuPerc;
@@ -17,21 +22,34 @@ public class DynamicSysInfo {
 	private static ApiHandler apiH = new ApiHandler();
 	private static PropertiesHandler propH = new PropertiesHandler();
 
+	static Map<String, Long> rxCurrentMap = new HashMap<String, Long>();
+	static Map<String, List<Long>> rxChangeMap = new HashMap<String, List<Long>>();
+	static Map<String, Long> txCurrentMap = new HashMap<String, Long>();
+	static Map<String, List<Long>> txChangeMap = new HashMap<String, List<Long>>();
+
+
 	public void sendInfo() throws SigarException{
 		apiH.apiCall("cpu/1/", cpuInfoD());
 		apiH.apiCall("ram/", ramInfoD());
-		apiH.apiCall("network/1/", networkInfoD());
+		apiH.apiCall("network/", networkInfoD());
+		//apiH.apiCall("disks/", 
+		diskInfoD();
 		apiH.apiCall("", sysInfoD());
-		/*try {
-			apiH.apiCall("network/1/", networkInfo());
-		} catch (IOException e1) {
+
+	}
+
+	private JSONObject diskInfoD() {
+	
+		
+		try {
+			System.out.println(sigar.getDirStat("C:\\").getDiskUsage());
+		} catch (SigarException e) {
 			// TODO Auto-generated catch block
-			e1.printStackTrace();
+			e.printStackTrace();
 		}
-		diskInfo();*/
-
-
-
+		
+		
+		return null;
 	}
 
 	public static JSONObject sysInfoD() throws SigarException{
@@ -68,42 +86,75 @@ public class DynamicSysInfo {
 	}
 
 	public static JSONObject networkInfoD() throws SigarException{
+
 		JSONObject net = new JSONObject();
+		Long[] m = getMetric();
+		long totalrx = m[0];
+		long totaltx = m[1];
 
-		String ramUsed = Long.toString(sigar.getMem().getUsed()/1024/1024);
-
-		String netName ;
-		
-		if(propH.getNetName() == null){
-			try {
-				propH.getEth();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-			netName = propH.getNetName();
-		}else{
-			netName = propH.getNetName();
-		}
-		
-		NetInterfaceStat netStat = sigar.getNetInterfaceStat(netName);
-		NetInterfaceConfig ifConfig = sigar.getNetInterfaceConfig(netName);
-
-        String hwaddr = null;
-        if (!NetFlags.NULL_HWADDR.equals(ifConfig.getHwaddr())) {
-            hwaddr = ifConfig.getHwaddr();
-        }
-        if (hwaddr != null) {
-		String down = Long.toString(netStat.getRxBytes()/1024);
-
-		String up = Long.toString(netStat.getTxBytes()/1024);
-		
+		String down = Long.toString(totalrx/1024);
+		String up = Long.toString(totaltx/1024);
 		net.put("upload_total ", up);
 		net.put("download_total ", down);
-        }
-		
-	
 
 		return net;
+	}
+
+	//http://stackoverflow.com/questions/11034753/sigar-network-speed
+	//COPY PASTED
+	
+	public static Long[] getMetric() throws SigarException {
+
+		for (String ni : sigar.getNetInterfaceList()) {
+
+			NetInterfaceStat netStat = sigar.getNetInterfaceStat(ni);
+			NetInterfaceConfig ifConfig = sigar.getNetInterfaceConfig(ni);
+			String hwaddr = null;
+			if (!NetFlags.NULL_HWADDR.equals(ifConfig.getHwaddr())) {
+				hwaddr = ifConfig.getHwaddr();
+			}
+			if (hwaddr != null) {
+				long rxCurrenttmp = netStat.getRxBytes();
+				saveChange(rxCurrentMap, rxChangeMap, hwaddr, rxCurrenttmp, ni);
+				long txCurrenttmp = netStat.getTxBytes();
+				saveChange(txCurrentMap, txChangeMap, hwaddr, txCurrenttmp, ni);
+			}
+		}
+		long totalrx = getMetricData(rxChangeMap);
+		long totaltx = getMetricData(txChangeMap);
+		for (List<Long> l : rxChangeMap.values())
+			l.clear();
+		for (List<Long> l : txChangeMap.values())
+			l.clear();
+		return new Long[] { totalrx, totaltx };
+	}
+
+
+	private static void saveChange(Map<String, Long> currentMap,
+			Map<String, List<Long>> changeMap, String hwaddr, long current,
+			String ni) {
+		Long oldCurrent = currentMap.get(ni);
+		if (oldCurrent != null) {
+			List<Long> list = changeMap.get(hwaddr);
+			if (list == null) {
+				list = new LinkedList<Long>();
+				changeMap.put(hwaddr, list);
+			}
+			list.add((current - oldCurrent));
+		}
+		currentMap.put(ni, current);
+	}
+
+	private static long getMetricData(Map<String, List<Long>> rxChangeMap) {
+		long total = 0;
+		for (Entry<String, List<Long>> entry : rxChangeMap.entrySet()) {
+			int average = 0;
+			for (Long l : entry.getValue()) {
+				average += l;
+			}
+			total += average / entry.getValue().size();
+		}
+		return total;
 	}
 
 
