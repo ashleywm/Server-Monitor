@@ -72,16 +72,36 @@ public class DynamicSysInfo {
 
 		String ramUsed = Long.toString(sigar.getMem().getUsed()/1024/1024);
 
-		NetInterfaceStat netStat = sigar.getNetInterfaceStat("eth1");
-		NetInterfaceConfig ifConfig = sigar.getNetInterfaceConfig("eth1");
+		String netName ;
+		
+		if(propH.getNetName() == null){
+			try {
+				propH.getEth();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			netName = propH.getNetName();
+		}else{
+			netName = propH.getNetName();
+		}
+		
+		NetInterfaceStat netStat = sigar.getNetInterfaceStat(netName);
+		NetInterfaceConfig ifConfig = sigar.getNetInterfaceConfig(netName);
 
+        String hwaddr = null;
+        if (!NetFlags.NULL_HWADDR.equals(ifConfig.getHwaddr())) {
+            hwaddr = ifConfig.getHwaddr();
+        }
+        if (hwaddr != null) {
 		String down = Long.toString(netStat.getRxBytes()/1024);
 
 		String up = Long.toString(netStat.getTxBytes()/1024);
-
 		
 		net.put("upload_total ", up);
 		net.put("download_total ", down);
+        }
+		
+	
 
 		return net;
 	}

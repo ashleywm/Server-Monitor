@@ -3,7 +3,10 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.InetAddress;
+import java.net.NetworkInterface;
 import java.net.URL;
+import java.util.Collections;
+import java.util.Enumeration;
 
 import javax.swing.filechooser.FileSystemView;
 
@@ -62,7 +65,6 @@ public class StaticSysInfo {
 			if(diskSize > 0){
 				JSONObject disk = new JSONObject();
 
-				disk.put("disk_id", id);
 				disk.put("total_space", diskSize);	
 				disk.put("disk_name", FileSystemView.getFileSystemView().getSystemDisplayName (path));
 
@@ -72,7 +74,7 @@ public class StaticSysInfo {
 					e.printStackTrace();
 				}
 
-				apiH.apiCall("disk/", disk);
+				apiH.apiCall("disk/"+id+"/", disk);
 
 				id++;
 			}
@@ -82,25 +84,43 @@ public class StaticSysInfo {
 	}
 
 	public static JSONObject networkInfo() throws SigarException, IOException{
-	
+
 		JSONObject net = new JSONObject();
 
 		URL getPublic = new URL("http://checkip.amazonaws.com");
 		BufferedReader buffer = new BufferedReader(new InputStreamReader(getPublic.openStream()));
 		String publicIP = buffer.readLine(); //you get the IP as a String
-		
+
 		InetAddress localIP = InetAddress.getLocalHost();
-		
+
+		Enumeration<NetworkInterface> nets = NetworkInterface.getNetworkInterfaces();
+		for (NetworkInterface netint : Collections.list(nets)){
+			Enumeration<InetAddress> inetAddresses = netint.getInetAddresses();
+			for (InetAddress inetAddress : Collections.list(inetAddresses)) {
+
+				String local = localIP.getHostAddress().toString();
+				String address = inetAddress.getHostAddress().toString();
+				
+				if(local.equalsIgnoreCase(address) ){
+									
+					String netName = netint.getName();
+					System.out.println("NETWORK ADAPATER NAME: "+netName );
+			
+					propH.storeEth(netName);
+				}
+			}
+		}
+
 		net.put("ip_address", localIP.getHostAddress());
 		net.put("hostname", sigar.getNetInfo().getHostName());
 		net.put("gateway",sigar.getNetInfo().getDefaultGateway());
 		net.put("public_ip", publicIP);
-		
+
 		return net;
-		
+
 	}
-	
-	
+
+
 	public static JSONObject ramInfo() throws SigarException{
 		JSONObject mem = new JSONObject();
 
