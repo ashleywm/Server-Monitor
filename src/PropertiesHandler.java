@@ -4,13 +4,13 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Properties;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 
 public class PropertiesHandler {
 
-	private String loc; 
-	private static String token = "", eth;
+	private static String token = "";
 	private static String DEFAULT_LOCATION = System.getProperty("user.home") + "/Monitoring/";
 	private static String DEFAULT_FILE = "config.properties";
 
@@ -111,21 +111,17 @@ public class PropertiesHandler {
 
 	public void storeDisk(JSONObject disk ) throws IOException {
 
-		Properties prop = new Properties();
-		System.out.println(token);
+		FileInputStream in = new FileInputStream(DEFAULT_LOCATION + DEFAULT_FILE);
+		Properties props = new Properties();
+		props.load(in);
+		in.close();
 
-		try {
-			prop.setProperty("Disk", disk.toString());
-
-			FileOutputStream fo = new FileOutputStream(DEFAULT_LOCATION+DEFAULT_FILE, true);
-			prop.store(fo, null);
-
-		} catch (IOException ex) {
-			ex.printStackTrace();
-		}
-
+		FileOutputStream out = new FileOutputStream(DEFAULT_LOCATION + DEFAULT_FILE);
+		props.setProperty("Disk", disk.toString());
+		props.store(out, null);
+		out.close();
 	}
-	
+
 	public void getDisks(JSONObject disk ) throws IOException {
 
 		Properties prop = new Properties();
@@ -143,10 +139,28 @@ public class PropertiesHandler {
 
 	}
 	
+	public  JSONArray returnDisks() throws IOException {
 
+		Properties prop = new Properties();
+
+		String Disk;
+		prop.load(new FileInputStream(DEFAULT_LOCATION+DEFAULT_FILE));
+
+		if(prop.getProperty("Disk") == null){
+			throw new RuntimeException("ERROR: Token not found");
+		}else{
+			Disk = prop.getProperty("Disk");
+			System.out.println("this " + Disk);
+		}
+		
+		JSONArray disk = new JSONArray(Disk);
+		
+		System.out.println(disk);
+		return disk;
+
+	}
 	
-
-	public String getToken() {
+	public String getToken(){
 		return token;
 	}
 

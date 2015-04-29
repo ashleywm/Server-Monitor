@@ -28,7 +28,7 @@ public class StaticSysInfo {
 		apiH.apiCall("ram/", ramInfo());
 		apiH.apiCall("", sysInfo());
 		try {
-			apiH.apiCall("network/1/", networkInfo());
+			apiH.apiCall("network/", networkInfo());
 		} catch (IOException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
@@ -45,7 +45,7 @@ public class StaticSysInfo {
 
 		cpu.put("vendor", info.getVendor());
 		cpu.put("model", info.getModel());
-		cpu.put("clockSpeed", info.getMhz());
+		cpu.put("clockSpeed", Integer.toString(info.getMhz()));
 		cpu.put("totalCores", info.getTotalCores());
 
 		return cpu;
@@ -67,19 +67,24 @@ public class StaticSysInfo {
 			if(diskSize > 0){
 				JSONObject disk = new JSONObject();
 
+				disk.put("disk_id", id);
 				disk.put("total_space", diskSize);	
 				disk.put("disk_name", FileSystemView.getFileSystemView().getSystemDisplayName (path));
-
-				try {
-					propH.storeDisk(disk);
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
+				
+				disks.put("total_space_"+id, diskSize);	
+				disks.put("disk_name_"+id, FileSystemView.getFileSystemView().getSystemDisplayName (path));
 
 				apiH.apiCall("disk/"+id+"/", disk);
 
 				id++;
 			}
+		}
+		
+
+		try {
+			propH.storeDisk(disks);
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 
 
@@ -95,10 +100,28 @@ public class StaticSysInfo {
 
 		InetAddress localIP = InetAddress.getLocalHost();
 
+
+		Enumeration<NetworkInterface> nets = NetworkInterface.getNetworkInterfaces();
+		for (NetworkInterface netint : Collections.list(nets)){
+			Enumeration<InetAddress> inetAddresses = netint.getInetAddresses();
+			for (InetAddress inetAddress : Collections.list(inetAddresses)) {
+
+				String local = localIP.getHostAddress().toString();
+				String address = inetAddress.getHostAddress().toString();
+
+				if(local.equalsIgnoreCase(address) ){
+
+					String netName = netint.getName();
+					System.out.println("NETWORK ADAPATER NAME: "+netName );
+
+				}
+			}
+		}
 		net.put("ip_address", localIP.getHostAddress());
 		net.put("hostname", sigar.getNetInfo().getHostName());
 		net.put("gateway",sigar.getNetInfo().getDefaultGateway());
 		net.put("public_ip", publicIP);
+		
 
 		return net;
 

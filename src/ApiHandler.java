@@ -6,8 +6,6 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import org.hyperic.sigar.Sigar;
-import org.hyperic.sigar.SigarException;
 import org.json.JSONObject;
 
 
@@ -99,4 +97,5 @@ public class ApiHandler {
 			e.printStackTrace();
 		}
 	}
+
 }

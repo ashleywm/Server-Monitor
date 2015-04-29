@@ -100,6 +100,10 @@ public class Controller {
 
 	public static void main(String args[]) throws SigarException, IOException {
 		
+		// System.load("C:/Users/Ashley/Desktop/sigar-amd64-winnt.dll");
+		
+		//propH.returnDisks();
+		
 		if(propH.checkDir() && propH.checkFile()){ //if the folder or file doesn't exist 
 
 			System.out.println("The system needs to be configured to start monitoring");
