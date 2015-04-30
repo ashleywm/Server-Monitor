@@ -1,24 +1,10 @@
-
 import java.io.File;
-import java.nio.file.FileStore;
-import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-
-
-
-
-
-
-
-
-import javax.swing.filechooser.FileSystemView;
-
 import org.hyperic.sigar.CpuPerc;
-import org.hyperic.sigar.FileSystem;
 import org.hyperic.sigar.FileSystemUsage;
 import org.hyperic.sigar.NetFlags;
 import org.hyperic.sigar.NetInterfaceConfig;
@@ -31,33 +17,22 @@ import org.json.JSONObject;
 public class DynamicSysInfo {
 
 	private static Sigar sigar = new Sigar();
-	private static Controller control = new Controller();
 	private static ApiHandler apiH = new ApiHandler();
-	private static PropertiesHandler propH = new PropertiesHandler();
 
-
-	private static long oldRead, oldWrite;
-
-	static Map<String, Long> rxCurrentMap = new HashMap<String, Long>();
-	static Map<String, List<Long>> rxChangeMap = new HashMap<String, List<Long>>();
-	static Map<String, Long> txCurrentMap = new HashMap<String, Long>();
-	static Map<String, List<Long>> txChangeMap = new HashMap<String, List<Long>>();
+	static Map<String, Long> newDown = new HashMap<String, Long>();
+	static Map<String, List<Long>> oldDown = new HashMap<String, List<Long>>();
+	static Map<String, Long> newUp = new HashMap<String, Long>();
+	static Map<String, List<Long>> oldUp = new HashMap<String, List<Long>>();
 
 	public void sendInfo() throws SigarException{
 		apiH.apiCall("cpu/1/", cpuInfoD());
 		apiH.apiCall("ram/", ramInfoD());
-		apiH.apiCall("network/", networkInfoD());
-		//apiH.apiCall("disks/", 
-		diskInfoD();
+		apiH.apiCall("network/", networkInfoD()); 
 		apiH.apiCall("", sysInfoD());
-
+		diskInfoD();
 	}
 
 	private void diskInfoD() throws SigarException {
-
-
-
-
 		String readSpeed = null;
 		String writeSpeed = null; 
 
@@ -84,7 +59,7 @@ public class DynamicSysInfo {
 
 			if(diskSize > 0){
 				String disk = (path).toString();
-				System.out.println(disk);
+	
 				FileSystemUsage usage = sigar.getFileSystemUsage(disk+"\\");
 
 				JSONObject diskSend = new JSONObject();
@@ -100,8 +75,6 @@ public class DynamicSysInfo {
 
 				diskArray[id] = read;
 				diskArray[id + 1] = write;
-
-				System.out.println("Read :"+readSpeed+" Write :"+writeSpeed);
 
 				long space = new File(disk+"\\").getFreeSpace();
 
@@ -154,51 +127,67 @@ public class DynamicSysInfo {
 	public static JSONObject networkInfoD() throws SigarException{
 
 		JSONObject net = new JSONObject();
-		Long[] m = getMetric();
-		long totalrx = m[0];
-		long totaltx = m[1];
+		Long[] l = getMetric();
+		long downLong = l[0];
+		long upLong = l[1];
 
-		String down = Long.toString(totalrx/1024);
-		String up = Long.toString(totaltx/1024);
+		String down = Long.toString(downLong/1024);
+		String up = Long.toString(upLong/1024);
 		net.put("upload_total", up);
 		net.put("download_total", down);
 
 		return net;
 	}
 
-	//http://stackoverflow.com/questions/11034753/sigar-network-speed
-	//COPY PASTED
 
 	public static Long[] getMetric() throws SigarException {
 
-		for (String ni : sigar.getNetInterfaceList()) {
-
-			NetInterfaceStat netStat = sigar.getNetInterfaceStat(ni);
-			NetInterfaceConfig ifConfig = sigar.getNetInterfaceConfig(ni);
+		String nicList[] = sigar.getNetInterfaceList();
+		long totalDown = 0;
+		long totalUp = 0;
+		int average = 0;
+		
+		for (String nic : nicList) {
+			NetInterfaceStat netInterface = sigar.getNetInterfaceStat(nic);
+			NetInterfaceConfig ifConfig = sigar.getNetInterfaceConfig(nic);
 			String hwaddr = null;
 			if (!NetFlags.NULL_HWADDR.equals(ifConfig.getHwaddr())) {
 				hwaddr = ifConfig.getHwaddr();
 			}
 			if (hwaddr != null) {
-				long rxCurrenttmp = netStat.getRxBytes();
-				saveChange(rxCurrentMap, rxChangeMap, hwaddr, rxCurrenttmp, ni);
-				long txCurrenttmp = netStat.getTxBytes();
-				saveChange(txCurrentMap, txChangeMap, hwaddr, txCurrenttmp, ni);
+				long newDownTmp = netInterface.getRxBytes();
+				saveChange(newDown, oldDown, hwaddr, newDownTmp, nic);
+				long newUpTmp = netInterface.getTxBytes();
+				saveChange(newUp, oldUp, hwaddr, newUpTmp, nic);
 			}
 		}
-		long totalrx = getMetricData(rxChangeMap);
-		long totaltx = getMetricData(txChangeMap);
-		for (List<Long> l : rxChangeMap.values())
+		
+		for (Entry<String, List<Long>> entry : oldDown.entrySet()) {
+			for (Long l : entry.getValue()) {
+				average += l;
+			}
+			totalDown += average / entry.getValue().size();
+		}
+		
+		
+		for (Entry<String, List<Long>> entry : oldUp.entrySet()) {
+			for (Long l : entry.getValue()) {
+				average += l;
+			}
+			totalUp += average / entry.getValue().size();
+		}
+		
+		for (List<Long> l : oldDown.values()){
 			l.clear();
-		for (List<Long> l : txChangeMap.values())
+		}
+		for (List<Long> l : oldUp.values()){
 			l.clear();
-		return new Long[] { totalrx, totaltx };
+		}
+	
+		return new Long[] { totalDown, totalUp };
 	}
 
-
-	private static void saveChange(Map<String, Long> currentMap,
-			Map<String, List<Long>> changeMap, String hwaddr, long current,
-			String ni) {
+	private static void saveChange(Map<String, Long> currentMap, Map<String, List<Long>> changeMap, String hwaddr, long current,String ni) {
 		Long oldCurrent = currentMap.get(ni);
 		if (oldCurrent != null) {
 			List<Long> list = changeMap.get(hwaddr);
@@ -210,18 +199,4 @@ public class DynamicSysInfo {
 		}
 		currentMap.put(ni, current);
 	}
-
-	private static long getMetricData(Map<String, List<Long>> rxChangeMap) {
-		long total = 0;
-		for (Entry<String, List<Long>> entry : rxChangeMap.entrySet()) {
-			int average = 0;
-			for (Long l : entry.getValue()) {
-				average += l;
-			}
-			total += average / entry.getValue().size();
-		}
-		return total;
-	}
-
-
 }

@@ -14,8 +14,8 @@ public class Controller {
 	private static PropertiesHandler propH = new PropertiesHandler();
 	private static StaticSysInfo isi = new StaticSysInfo();
 	private static ApiHandler apiH = new ApiHandler();
-	public static final String DEFAULT_LOCATION = System.getProperty("user.home") + "/Monitoring/";
-	public static final String DEFAULT_FILE = "config.properties";
+	private static String DEFAULT_LOCATION = PropertiesHandler.getDefaultLocation();
+	private static String DEFAULT_FILE = PropertiesHandler.getDefaultFile();
 
 
 	public static void repeater() {

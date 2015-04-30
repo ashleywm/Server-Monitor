@@ -123,6 +123,14 @@ public class PropertiesHandler {
 		return token;
 	}
 
+	public static String getDefaultLocation() {
+		return DEFAULT_LOCATION;
+	}
+
+	public static String getDefaultFile() {
+		return DEFAULT_FILE;
+	}
+
 }
 
 
