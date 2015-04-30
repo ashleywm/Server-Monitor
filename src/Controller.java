@@ -1,25 +1,26 @@
-
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Scanner;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import org.hyperic.sigar.SigarException;
-import org.json.JSONObject;
+
 
 public class Controller {
 
-	// static ConfigReader properties = new ConfigReader();
 	private static String sysName = "", token;
 	private static PropertiesHandler propH = new PropertiesHandler();
+	private static StaticSysInfo isi = new StaticSysInfo();
 	private static ApiHandler apiH = new ApiHandler();
-	private static final String DEFAULT_LOCATION = System.getProperty("user.home") + "/Monitoring/";
-	private static final String DEFAULT_FILE = "config.properties";
+	public static final String DEFAULT_LOCATION = System.getProperty("user.home") + "/Monitoring/";
+	public static final String DEFAULT_FILE = "config.properties";
 
 
 	public static void repeater() {
 		int initialDelay = 10000; // start after 30 seconds
-		int period = 5000; // repeat every 5 seconds
+		int period = 10000; // repeat every 5 seconds
 		Timer timer = new Timer();
 
 		TimerTask task = new TimerTask() {
@@ -43,11 +44,17 @@ public class Controller {
 			}
 	}
 
-	public static void enterContinue() {
+	public static void enterContinue(String to) {
+		
+		if (to == ""){
 		System.out.println("Press enter to continue...");
+		}else{
+			System.out.println("Press enter to "+to);
+		}
+		
 		Scanner keyIn = new Scanner(System.in);
 		keyIn.nextLine();
-
+			
 	}
 
 	public static void nameSystem() {
@@ -59,8 +66,6 @@ public class Controller {
 			System.out.println("Please enter a friendly system name ");
 			sysName = nameIn.nextLine();
 		}
-		System.out.println(sysName);
-
 	}
 
 	public static void userkey() {
@@ -86,78 +91,76 @@ public class Controller {
 
 		in = input.next();
 		if(in.equalsIgnoreCase("y")){
-			System.out.println("yyyy");
+			try {
+				System.out.println("Updating...");
+				isi.sendInfo();
+			} catch (SigarException e) {
+				throw new RuntimeException("Failed : Unable to update the system properties");
+			}
 		}else{
 			while(!(in.equalsIgnoreCase("n"))){
 				System.out.println("Configuration is valid, do you want to force a system check? Y/N");
 				in = input.next();
 			}
-
+			
 		}
 		input.close();
 	}
 
+	public static void starter() throws IOException{
+		enterContinue("");
+		nameSystem();
+		userkey();
+	}
 
 	public static void main(String args[]) throws SigarException, IOException {
 		
-		// System.load("C:/Users/Ashley/Desktop/sigar-amd64-winnt.dll");
-		
-		//propH.returnDisks();
+		System.out.println("Welcome to PULSr, the monitoring service for your multi-platform server\n");
 		
 		if(propH.checkDir() && propH.checkFile()){ //if the folder or file doesn't exist 
-
 			System.out.println("The system needs to be configured to start monitoring");
-			enterContinue();
-			nameSystem();
-			userkey();
+			starter();
 
 			propH.makeDir();
 			propH.writeInitial(sysName, token, DEFAULT_LOCATION+DEFAULT_FILE);
 
-			System.out.println("Configuration has been Made in " +DEFAULT_LOCATION+DEFAULT_FILE);
+			System.out.println("Configuration has been Made in " +DEFAULT_LOCATION+DEFAULT_FILE + "\nThe new installation needs to send initial data to the service");
+			enterContinue("");
+			propH.storeToken();
+			isi.sendInfo();
 		}else if(!(propH.checkDir()) && propH.checkFile()){  //if the folder exists but the file does not 
 
 			System.out.println("The system needs to be configured to start monitoring");
-			enterContinue();
-			nameSystem();
-			userkey();
+			starter();
 			
 			propH.writeInitial(sysName, token, DEFAULT_LOCATION+DEFAULT_FILE);
 
-			System.out.println("Configuration has been Made in " +DEFAULT_LOCATION+DEFAULT_FILE);
+			System.out.println("A new server configuration has been Made in " +DEFAULT_LOCATION+DEFAULT_FILE + "\nThe new installation needs to send initial data to the service");
+			enterContinue("");
+			propH.storeToken();
+			isi.sendInfo();
 
 		}else if(!(propH.checkDir() && propH.checkFile())){ //if both exist 
 			if(!(propH.checkConfig())){
 				System.out.println("The system needs to be configured to start monitoring");
-				enterContinue();
-				nameSystem();
-				userkey();
+				starter();
 
 				propH.writeInitial(sysName, token, DEFAULT_LOCATION+DEFAULT_FILE);
-
-				System.out.println("Configuration has been Made in " +DEFAULT_LOCATION+DEFAULT_FILE);
+				System.out.println("A new server configuration has been Made in " +DEFAULT_LOCATION+DEFAULT_FILE);
 			}else if(propH.checkConfig()){
-				System.out.println("Configuration is valid, do you want to force a system check? Y/N \n(Recommended if you have changed system hardware)");
-				updateConfig();
+				System.out.println("Current configuration is valid, do you want to force a system check?\n(Recommended if you have changed system hardware or haven't used PULSr in a while)\ny/n ");
+				propH.storeToken();
 				
+				updateConfig();
+				System.out.println("...Done\n");
+				//enterContinue("start monitoring your system\n");
 				
 			}
 
 		}
-
-		//repeater();
-		//ApiCall ac = new ApiCall();
-		//ApiCall.call();
 		
-		propH.storeToken();
-		
-		
-		//repeater();
-
-		StaticSysInfo isi = new StaticSysInfo();
-		isi.sendInfo();
-		
-		System.out.println("Starting Repeating Tasks");
+	
+		System.out.println("PULSr is now monitoring your system go to http://student20265.201415.uk/pmt/");
 		
 		repeater();
 

@@ -3,11 +3,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.InetAddress;
-import java.net.NetworkInterface;
 import java.net.URL;
-import java.util.Collections;
-import java.util.Enumeration;
-
 import javax.swing.filechooser.FileSystemView;
 
 import org.hyperic.sigar.CpuInfo;
@@ -30,7 +26,6 @@ public class StaticSysInfo {
 		try {
 			apiH.apiCall("network/", networkInfo());
 		} catch (IOException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 		diskInfo();
@@ -70,7 +65,7 @@ public class StaticSysInfo {
 				disk.put("disk_id", id);
 				disk.put("total_space", diskSize);	
 				disk.put("disk_name", FileSystemView.getFileSystemView().getSystemDisplayName (path));
-				
+
 				disks.put("total_space_"+id, diskSize);	
 				disks.put("disk_name_"+id, FileSystemView.getFileSystemView().getSystemDisplayName (path));
 
@@ -79,7 +74,7 @@ public class StaticSysInfo {
 				id++;
 			}
 		}
-		
+
 
 		try {
 			propH.storeDisk(disks);
@@ -100,28 +95,10 @@ public class StaticSysInfo {
 
 		InetAddress localIP = InetAddress.getLocalHost();
 
-
-		Enumeration<NetworkInterface> nets = NetworkInterface.getNetworkInterfaces();
-		for (NetworkInterface netint : Collections.list(nets)){
-			Enumeration<InetAddress> inetAddresses = netint.getInetAddresses();
-			for (InetAddress inetAddress : Collections.list(inetAddresses)) {
-
-				String local = localIP.getHostAddress().toString();
-				String address = inetAddress.getHostAddress().toString();
-
-				if(local.equalsIgnoreCase(address) ){
-
-					String netName = netint.getName();
-					System.out.println("NETWORK ADAPATER NAME: "+netName );
-
-				}
-			}
-		}
 		net.put("ip_address", localIP.getHostAddress());
 		net.put("hostname", sigar.getNetInfo().getHostName());
 		net.put("gateway",sigar.getNetInfo().getDefaultGateway());
 		net.put("public_ip", publicIP);
-		
 
 		return net;
 
@@ -134,8 +111,6 @@ public class StaticSysInfo {
 		String ramTotal = Long.toString(sigar.getMem().getTotal()/1024/1024);
 
 		mem.put("total", ramTotal);
-
-		System.out.println(mem);
 
 		return mem;
 	}

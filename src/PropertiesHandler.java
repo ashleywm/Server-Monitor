@@ -3,16 +3,14 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Properties;
-
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 
 public class PropertiesHandler {
 
 	private static String token = "";
-	private static String DEFAULT_LOCATION = System.getProperty("user.home") + "/Monitoring/";
-	private static String DEFAULT_FILE = "config.properties";
+	private static final String DEFAULT_LOCATION = System.getProperty("user.home") + "/Monitoring/";
+	private static final String DEFAULT_FILE = "config.properties";
 
 
 	public boolean checkDir(){
@@ -25,7 +23,7 @@ public class PropertiesHandler {
 	}
 
 	public boolean checkFile(){
-		File theDir = new File(DEFAULT_LOCATION+DEFAULT_FILE);
+		File theDir = new File(DEFAULT_LOCATION + DEFAULT_FILE);
 		if (!(theDir.exists())){
 			return true;
 		}else{
@@ -75,9 +73,7 @@ public class PropertiesHandler {
 		} catch (IOException ex) {
 			ex.printStackTrace();
 		}
-
 	}
-
 
 	public boolean checkConfig() throws IOException {
 
@@ -85,10 +81,11 @@ public class PropertiesHandler {
 
 		prop.load(new FileInputStream(DEFAULT_LOCATION+DEFAULT_FILE));
 
+		String token = prop.getProperty("Token");
 		String name = prop.getProperty("System_Name");
-		name = name.replaceAll("[^a-zA-Z\\s]", ""); //buggy 
+		name = name.replaceAll("[^a-zA-Z\\s]", ""); 
 
-		if(prop.getProperty("System_Name") != null && name != null ){
+		if(name != null && token != null){
 			return true; //name is configured 
 		}else{
 			return false;
@@ -99,13 +96,12 @@ public class PropertiesHandler {
 
 		Properties prop = new Properties();
 
-		prop.load(new FileInputStream(DEFAULT_LOCATION+DEFAULT_FILE));
+		prop.load(new FileInputStream(DEFAULT_LOCATION + DEFAULT_FILE));
 
 		if(prop.getProperty("Token") == null){
 			throw new RuntimeException("ERROR: Token not found");
 		}else{
 			token = prop.getProperty("Token");
-			System.out.println("this " + token);
 		}
 	}
 
@@ -122,43 +118,6 @@ public class PropertiesHandler {
 		out.close();
 	}
 
-	public void getDisks(JSONObject disk ) throws IOException {
-
-		Properties prop = new Properties();
-		System.out.println(token);
-
-		try {
-			prop.setProperty("Disk", disk.toString());
-
-			FileOutputStream fo = new FileOutputStream(DEFAULT_LOCATION+DEFAULT_FILE, true);
-			prop.store(fo, null);
-
-		} catch (IOException ex) {
-			ex.printStackTrace();
-		}
-
-	}
-	
-	public  JSONArray returnDisks() throws IOException {
-
-		Properties prop = new Properties();
-
-		String Disk;
-		prop.load(new FileInputStream(DEFAULT_LOCATION+DEFAULT_FILE));
-
-		if(prop.getProperty("Disk") == null){
-			throw new RuntimeException("ERROR: Token not found");
-		}else{
-			Disk = prop.getProperty("Disk");
-			System.out.println("this " + Disk);
-		}
-		
-		JSONArray disk = new JSONArray(Disk);
-		
-		System.out.println(disk);
-		return disk;
-
-	}
 	
 	public String getToken(){
 		return token;

@@ -3,7 +3,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 
 import org.json.JSONObject;
@@ -22,33 +21,29 @@ public class ApiHandler {
 
 			URL url = new URL("http://student20265.201415.uk/pmt/api/auth/server/");
 
-			HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-			conn.setDoOutput(true);
-			conn.setRequestMethod("POST");
-			conn.setRequestProperty("Content-Type", "application/json");
+			HttpURLConnection httpConn = (HttpURLConnection) url.openConnection();
+			httpConn.setDoOutput(true);
+			httpConn.setRequestMethod("POST");
+			httpConn.setRequestProperty("Content-Type", "application/json");
 
-			OutputStream os = conn.getOutputStream();
+			OutputStream os = httpConn.getOutputStream();
 			os.write(input.toString().getBytes());
 			os.flush();
 
-			if (conn.getResponseCode() != HttpURLConnection.HTTP_OK) {
+			if (httpConn.getResponseCode() != HttpURLConnection.HTTP_OK) {
 				throw new RuntimeException("Failed : HTTP error code : "
-						+ conn.getResponseCode());
+						+ httpConn.getResponseCode());
 			}
 
 			BufferedReader br = new BufferedReader(new InputStreamReader(
-					(conn.getInputStream())));
+					(httpConn.getInputStream())));
 
 			String output = br.readLine();
 
 			JSONObject obj = new JSONObject(output);
-			System.out.println(token = obj.get("token").toString());
+			token = obj.get("token").toString();
 
-			conn.disconnect();
-
-		} catch (MalformedURLException e) {
-
-			e.printStackTrace();
+			httpConn.disconnect();
 
 		} catch (IOException e) {
 
@@ -60,37 +55,32 @@ public class ApiHandler {
 	}
 
 
-	public void apiCall(String apiUrl, JSONObject input ) {
+	public void apiCall(String updateUrl, JSONObject input ) {
 		
 		PropertiesHandler proph = new PropertiesHandler();
 		
 		input.put("token", proph.getToken());
-		
-		System.out.println(input);
+		//System.out.println(input); uncomment to see whats going out
 		
 		try {
 
-			URL url = new URL("http://student20265.201415.uk/pmt/api/update/"+apiUrl);
+			URL url = new URL("http://student20265.201415.uk/pmt/api/update/" + updateUrl);
 
-			HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-			conn.setDoOutput(true);
-			conn.setRequestMethod("POST");
-			conn.setRequestProperty("Content-Type", "application/json");
+			HttpURLConnection httpConn = (HttpURLConnection) url.openConnection();
+			httpConn.setDoOutput(true);
+			httpConn.setRequestMethod("POST");
+			httpConn.setRequestProperty("Content-Type", "application/json");
 
-			OutputStream os = conn.getOutputStream();
+			OutputStream os = httpConn.getOutputStream();
 			os.write(input.toString().getBytes());
 			os.flush();
 
-			if (conn.getResponseCode() != HttpURLConnection.HTTP_OK) {
+			if (httpConn.getResponseCode() != HttpURLConnection.HTTP_OK) {
 				throw new RuntimeException("Failed : HTTP error code : "
-						+ conn.getResponseCode());
+						+ httpConn.getResponseCode());
 			}
 
-			conn.disconnect();			
-
-		} catch (MalformedURLException e) {
-
-			e.printStackTrace();
+			httpConn.disconnect();			
 
 		} catch (IOException e) {
 
