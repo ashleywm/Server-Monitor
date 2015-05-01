@@ -14,13 +14,13 @@ public class Controller {
 	private static PropertiesHandler propH = new PropertiesHandler();
 	private static StaticSysInfo isi = new StaticSysInfo();
 	private static ApiHandler apiH = new ApiHandler();
-	private static String DEFAULT_LOCATION = PropertiesHandler.getDefaultLocation();
-	private static String DEFAULT_FILE = PropertiesHandler.getDefaultFile();
+	private static String DEFAULT_LOCATION = PropertiesHandler.getDefaultLocation(); //return the location 
+	private static String DEFAULT_FILE = PropertiesHandler.getDefaultFile(); //return file 
 
 
 	public static void repeater() {
-		int initialDelay = 10000; // start after 30 seconds
-		int period = 10000; // repeat every 5 seconds
+		int initialDelay = 10000; // start after 10 seconds
+		int period = 5000; // repeat every 5 seconds
 		Timer timer = new Timer();
 
 		TimerTask task = new TimerTask() {
@@ -35,16 +35,19 @@ public class Controller {
 	}
 
 	public static void task() {
+		
+		//the task is what the repeater repeats every 5 seconds
 			DynamicSysInfo dsi = new DynamicSysInfo();
 			try {
-				dsi.sendInfo();
+				dsi.sendInfo(); //update the info 
 			} catch (SigarException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 	}
 
 	public static void enterContinue(String to) {
+		
+		//adds a wait to ui so the user has to press enter
 		
 		if (to == ""){
 		System.out.println("Press enter to continue...");
@@ -62,28 +65,32 @@ public class Controller {
 
 		System.out.println("Please enter a friendly system name ");
 		sysName = nameIn.nextLine();
-		while (sysName.equalsIgnoreCase("")) {
+		while (sysName.equalsIgnoreCase("")) { //can't be empty
 			System.out.println("Please enter a friendly system name ");
 			sysName = nameIn.nextLine();
 		}
 	}
 
 	public static void userkey() {
+		
+		//user must enter a key into the system
 		Scanner keyIn = new Scanner(System.in);
 
 		String key;
 		
 		System.out.println("Please enter the system key ");
 		key = keyIn.next();
-		while (key.equalsIgnoreCase("")) {
+		while (key.equalsIgnoreCase("")) { //forces user to enter at least 1 char could do with ore validation here but keys change 
 			System.out.println("Please enter the system key ");
 			key = keyIn.next();
 		}
-		token = apiH.getToken(key);
+		token = apiH.getToken(key); //sends the key to the api handler which then quieries the api and returns the associated authenticated token
 
 	}
 	
 	public static void updateConfig(){
+		
+		//this prompts the users if they would like to update the config the config is the static information 
 
 		Scanner input = new Scanner(System.in);
 
@@ -98,7 +105,7 @@ public class Controller {
 				throw new RuntimeException("Failed : Unable to update the system properties");
 			}
 		}else{
-			while(!(in.equalsIgnoreCase("n"))){
+			while(!(in.equalsIgnoreCase("n"))){ //while loop forces the user to enter either y or n 
 				System.out.println("Configuration is valid, do you want to force a system check? Y/N");
 				in = input.next();
 			}
@@ -108,12 +115,16 @@ public class Controller {
 	}
 
 	public static void starter() throws IOException{
+		
+		//this is to prevents code repitition  
 		enterContinue("");
 		nameSystem();
 		userkey();
 	}
 
 	public static void main(String args[]) throws SigarException, IOException {
+		
+		//the main hold the main UI to start the monitoring app, there is no serious logic here 
 		
 		System.out.println("Welcome to PULSr, the monitoring service for your multi-platform server\n");
 		

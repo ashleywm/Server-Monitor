@@ -9,11 +9,11 @@ import org.json.JSONObject;
 public class PropertiesHandler {
 
 	private static String token = "";
-	private static final String DEFAULT_LOCATION = System.getProperty("user.home") + "/Monitoring/";
-	private static final String DEFAULT_FILE = "config.properties";
+	private static final String DEFAULT_LOCATION = System.getProperty("user.home") + "/Monitoring/"; //where the config should be stored
+	private static final String DEFAULT_FILE = "config.properties"; //what it should be named
 
 
-	public boolean checkDir(){
+	public boolean checkDir(){ //make sure the dir exists
 		File theDir = new File(DEFAULT_LOCATION);
 		if (!(theDir.exists())){
 			return true;
@@ -22,7 +22,7 @@ public class PropertiesHandler {
 		}
 	}
 
-	public boolean checkFile(){
+	public boolean checkFile(){ //this checks to see if the config file already exists inside of the dir
 		File theDir = new File(DEFAULT_LOCATION + DEFAULT_FILE);
 		if (!(theDir.exists())){
 			return true;
@@ -31,7 +31,7 @@ public class PropertiesHandler {
 		}
 	}
 
-	public void makeDir(){
+	public void makeDir(){ //if dir does not exist or brand new config make a new dir 
 		try{
 			boolean success = (new File(DEFAULT_LOCATION)).mkdir();
 			if (!(success)) {
@@ -42,7 +42,7 @@ public class PropertiesHandler {
 		}
 	}
 
-	public void makeFile() {
+	public void makeFile() { //after making a new dir make a new file 
 
 		try {
 			File file = new File(DEFAULT_LOCATION + DEFAULT_FILE );
@@ -64,10 +64,12 @@ public class PropertiesHandler {
 
 		try {
 
-			prop.setProperty("System_Name", name);
-			prop.setProperty("Token", token);
+			prop.setProperty("System_Name", name); //create a property clled system name and save the value name
+			prop.setProperty("Token", token); //do the same with token
+			
+			//token is stored in the the properties file, see docs about this
 
-			FileOutputStream fo = new FileOutputStream(loc);
+			FileOutputStream fo = new FileOutputStream(loc); //write
 			prop.store(fo, null);
 
 		} catch (IOException ex) {
@@ -81,7 +83,7 @@ public class PropertiesHandler {
 
 		prop.load(new FileInputStream(DEFAULT_LOCATION+DEFAULT_FILE));
 
-		String token = prop.getProperty("Token");
+		String token = prop.getProperty("Token"); //check to see if the config file has these values
 		String name = prop.getProperty("System_Name");
 		name = name.replaceAll("[^a-zA-Z\\s]", ""); 
 
@@ -92,7 +94,7 @@ public class PropertiesHandler {
 		}
 	}
 
-	public void storeToken() throws IOException {
+	public void storeToken() throws IOException { //get the token from the properties file 
 
 		Properties prop = new Properties();
 
@@ -107,17 +109,19 @@ public class PropertiesHandler {
 
 	public void storeDisk(JSONObject disk ) throws IOException {
 
-		FileInputStream in = new FileInputStream(DEFAULT_LOCATION + DEFAULT_FILE);
+		FileInputStream in = new FileInputStream(DEFAULT_LOCATION + DEFAULT_FILE); //store all the disks
 		Properties props = new Properties();
 		props.load(in);
 		in.close();
 
+		//just update the file 
 		FileOutputStream out = new FileOutputStream(DEFAULT_LOCATION + DEFAULT_FILE);
 		props.setProperty("Disk", disk.toString());
 		props.store(out, null);
 		out.close();
 	}
 
+	//returns 
 	
 	public String getToken(){
 		return token;

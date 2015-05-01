@@ -33,6 +33,7 @@ public class StaticSysInfo {
 
 	public static JSONObject cpuInfo() throws SigarException{
 
+		//get static info for cpu from sigar 
 		JSONObject cpu = new JSONObject();
 
 		CpuInfo[] infos = sigar.getCpuInfoList();
@@ -48,6 +49,7 @@ public class StaticSysInfo {
 
 	public static void diskInfo() throws SigarException{
 
+		//get disk information for every disk 
 		JSONObject disks = new JSONObject();
 
 		File[] paths;
@@ -56,13 +58,13 @@ public class StaticSysInfo {
 
 		int id = 1;
 
-		for(File path:paths){
+		for(File path:paths){ //for every path get this information 
 			long diskSize = new File(path.toString()).getTotalSpace();
 			diskSize = diskSize/1024/1024; //mb 
 			if(diskSize > 0){
 				JSONObject disk = new JSONObject();
 
-				disk.put("disk_id", id);
+				disk.put("disk_id", id); //create an id
 				disk.put("total_space", diskSize);	
 				disk.put("disk_name", FileSystemView.getFileSystemView().getSystemDisplayName (path));
 
@@ -87,6 +89,8 @@ public class StaticSysInfo {
 
 	public static JSONObject networkInfo() throws SigarException, IOException{
 
+		//get the required networking info, gateway doesn't always work depending on the NIC
+		
 		JSONObject net = new JSONObject();
 
 		URL getPublic = new URL("http://checkip.amazonaws.com");
@@ -119,6 +123,7 @@ public class StaticSysInfo {
 	public static JSONObject sysInfo() throws SigarException{
 		JSONObject sys = new JSONObject();
 
+		//return the OS name 
 		sys.put("operating_system", System.getProperty("os.name"));
 		sys.put("name", control.getSysName());
 
